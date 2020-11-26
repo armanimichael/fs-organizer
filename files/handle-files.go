@@ -9,15 +9,47 @@ import (
 	"strings"
 )
 
+// UppercaseDirs sets every directory under rootDir to uppercase
+func UppercaseDirs(rootDir string) {
+	loopDirs(&rootDir, func(i int, f os.FileInfo) error {
+		newName := strings.ToUpper(f.Name())
+
+		err := os.Rename(rootDir+f.Name(), rootDir+newName)
+		if err != nil {
+			log.Println(err)
+			return err
+		}
+
+		return nil
+	})
+}
+
+// LowercaseDirs sets every directory under rootDir to lowercase
+func LowercaseDirs(rootDir string) {
+	loopDirs(&rootDir, func(i int, f os.FileInfo) error {
+		newName := strings.ToLower(f.Name())
+
+		err := os.Rename(rootDir+f.Name(), rootDir+newName)
+		if err != nil {
+			log.Println(err)
+			return err
+		}
+
+		return nil
+	})
+}
+
 // EnumerateDirs renames directories inside rootDir making them start with numbers
 // (eg. dirname = folder => 1-folder)
-func EnumerateDirs(rootDir string, removeSpaces bool, allCaps bool) {
+func EnumerateDirs(rootDir string, removeSpaces, upperCase, lowerCase bool) {
 	var newName string
 	loopDirs(&rootDir, func(i int, f os.FileInfo) error {
-		if allCaps {
+		if upperCase {
 			newName = strings.ToUpper(f.Name())
-		} else {
+		} else if lowerCase {
 			newName = strings.ToLower(f.Name())
+		} else {
+			newName = f.Name()
 		}
 
 		if removeSpaces {
